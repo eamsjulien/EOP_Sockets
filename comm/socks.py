@@ -2,6 +2,7 @@ import socket
 import os
 import time
 import inspect
+import subprocess
 
 
 def init_eopsock_environ_folder(capture_loc=None, eop_loc=None):
@@ -57,8 +58,15 @@ def init_server_socket(address=None, port=5000):
         A server socket where the program can receive messages.
     """
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#    This implementation only returns the loopback address
+#    if address is None:
+#        address = socket.gethostbyname(socket.gethostname())
     if address is None:
-        address = socket.gethostbyname(socket.gethostname())
+        cmd = (r"ip addr show | awk '$1 ~ /^inet$/ { print $2 }' "
+               r"| sed 's/\/[0-9]*//g' | grep -v '127.0.0.1' -m1"
+              )
+        ip_raw = subprocess.check_output([cmd], shell=True)
+        address = ip_raw.decode('utf-8')[:-1]
     server_socket.bind((address, port))
     return server_socket
 
