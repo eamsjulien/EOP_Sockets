@@ -49,7 +49,7 @@ if [[ "${MODE}" = "server" ]]; then
   if [[ ! -d "$EOP_SOCKET_EOP_FOLDER" ]]; then
     echo "No EasyOpenPose installation found."
     echo "Aborting..."
-    return 1
+    exit 1
   fi
   if [[ `ls -1 inbox/*.jpg 2>/dev/null | wc -l` -gt 0 ]]; then
     rm inbox/*.jpg

@@ -44,7 +44,7 @@ def init_client_socket(address, port=5000):
     client_socket.connect((address, port))
     return client_socket
 
-def init_server_socket(address='192.168.100.111', port=5000):
+def init_server_socket(address=None, port=5000):
     """Initialize server socket.
 
     Args:

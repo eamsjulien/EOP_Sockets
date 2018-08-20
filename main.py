@@ -1,22 +1,31 @@
 """
-Main handler for the AWS server component.
+Main handler for the EOP_Sockets server component.
 
-Usage: python3 main.py
+Usage: python3 main.py [--sleep SLEEP]
 """
 
 import os
-import time
+import argparse
 
 import comm.socks as ch
 
 def main():
     """Main function for server loop."""
 
-    # FACEDETECT SERVER #
+    # PYTHON PARSER VIA ARGPARSE #
 
-    print(" -------------------------")
-    print("| AWS FACEDETECT - SERVER |")
-    print(" -------------------------")
+    parser = argparse.ArgumentParser(description="EOP_Sockets Client Main.")
+    parser.add_argument("-s", "--sleep", help="Sleep in seconds.",
+                        nargs='?', default=0.1, type=float)
+    args = vars(parser.parse_args())
+
+    sleep = args['sleep']
+
+    # EOP_Sockets SERVER #
+
+    print(" ----------------------")
+    print("| EOP Sockets - SERVER |")
+    print(" ----------------------")
 
     print("\n Initializing ENV variables...", end='')
     save_loc, eop_loc = ch.init_eopsock_environ_folder()
@@ -66,13 +75,11 @@ def main():
     print("\nFrames processing completed!")
 
     print("\n **** SENDING FRAMES ****")
-
     for curr_frame in [frame_step*x for x in range(int(frame_nbr/frame_step))]:
-        time.sleep(0.2)
         frame_loc = "inbox/frame" + str(curr_frame) + ".jpg"
         ch.send_frame_size(client, frame_loc)
         print("Sending frame %s..." % str(curr_frame), end='')
-        ch.send_frame(client, frame_loc, sleep=0.1)
+        ch.send_frame(client, frame_loc, sleep=sleep)
         print("Done.")
         print("Waiting for frame " + str(curr_frame) + " reception...", end='')
         ch.waiting_for_ack(client, curr_frame)
@@ -85,9 +92,9 @@ def main():
     server_socket.close()
     print("Done!")
 
-    print("\n --------------------------")
-    print("| AWS FACEDETECT - GOODBYE |")
-    print(" --------------------------")
+    print("\n ---------------------")
+    print("| EOP Sockets - GOODBYE |")
+    print(" -----------------------")
 
 if __name__ == '__main__':
     main()
