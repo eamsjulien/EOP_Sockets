@@ -9,7 +9,7 @@ import argparse
 
 import comm.socks as ch
 
-def main():
+def main(): # pylint: disable=too-many-statements
     """Main function for server loop."""
 
     # PYTHON PARSER VIA ARGPARSE #
@@ -43,15 +43,15 @@ def main():
     frame_nbr = int(ch.receive_bytes_to_string(client))
     print("Expecting " + str(frame_nbr) + " frames from remote host.")
 
-    print("Sending ack...", end='')
-    ch.send_frame_ack(client, 0)
+    print("Sending frame number ack...", end='')
+    ch.send_frame_ack(client, exptype='FRAME_NBR')
     print("Sent.")
 
     frame_step = int(ch.receive_bytes_to_string(client))
     print("Looping every " + str(frame_step) + " steps.")
 
-    print("Sending ack...", end='')
-    ch.send_frame_ack(client, 0)
+    print("Sending increment ack...", end='')
+    ch.send_frame_ack(client, exptype='INCREMENT')
     print("Sent.")
 
     print("\n **** RECEIVING FRAMES ****")
@@ -69,7 +69,7 @@ def main():
                   + str(curr_frame) + '.jpg')
 
         print("Sending ack...", end='')
-        ch.send_frame_ack(client, curr_frame)
+        ch.send_frame_ack(client, frame=curr_frame)
         print("Sent.")
 
     print("\nFrames processing completed!")

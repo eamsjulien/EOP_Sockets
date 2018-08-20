@@ -2,16 +2,17 @@
 Main handler for the client component.
 
 Usage: python3 main_client.py --address ADDRESS [--frames FRAMES]
-                             [--sleep SLEEP]
+                             [--sleep SLEEP] [--rate RATE]
 """
 
 
 import argparse
 
-import client.client as cl
+import comm.socks as cs
 from client.camera import Camera
+from client.converter import Converter
 
-def main():
+def main(): #pylint: disable=too-many-locals, too-many-statements
     """Main function for client loop."""
 
     # PYTHON PARSER VIA ARGPARSE #
@@ -25,12 +26,15 @@ def main():
                         nargs='?', default=3, type=int)
     parser.add_argument("-s", "--sleep", help="Sleep in seconds.",
                         nargs='?', default=0.1, type=float)
+    parser.add_argument("-r", "--rate", help="Video FPS.",
+                        nargs='?', default=20, type=int)
     args = vars(parser.parse_args())
 
     frame_nbr = args['frames']
     server_addr = args['address']
     sleep = args['sleep']
     increment = args['increment']
+    rate = args['rate']
 
     # FACEDETECT CLIENT #
 
@@ -39,11 +43,11 @@ def main():
     print(" -------------------------")
 
     print("\n Initializing ENV variables...", end='')
-    capture_loc = cl.init_facedetect_environ_folder()
+    capture_loc, save_loc = cs.init_eopsock_environ_folder()
     print("Done!")
 
     print("\n Initializing server socket...", end='')
-    client_socket = cl.init_client_socket(server_addr)
+    client_socket = cs.init_client_socket(server_addr)
     print("Done!")
 
     print("\n **** CAPTURING FRAMES ****")
@@ -52,28 +56,63 @@ def main():
     print(" " + str(frame_nbr) + " frames captured!")
 
     print("\n **** SENDING FRAMES NBR ****")
-    cl.send_total_frame_nbr(client_socket, frame_nbr)
+    cs.send_total_frame_nbr(client_socket, frame_nbr)
     print(" Frames number sent to server!")
 
+    print("Waiting frame number ack...", end='')
+    cs.waiting_for_ack(client_socket, exptype='FRAME_NBR')
+    print("ACK")
+
     print("\n **** SENDING INCREMENT NBR ****")
-    cl.send_increment_nbr(client_socket, increment)
+    cs.send_increment_nbr(client_socket, increment)
     print(" Frames increment sent to server!")
+
+    print("Waiting increment number ack...", end='')
+    cs.waiting_for_ack(client_socket, exptype='INCREMENT')
+    print("ACK")
 
     print("\n **** SENDING FRAMES ****")
     for frame in [increment*x for x in range(int(frame_nbr/increment))]:
         frame_loc = capture_loc + "frame" + str(frame) + ".jpg"
-        cl.send_frame_size(client_socket, frame_loc)
+        cs.send_frame_size(client_socket, frame_loc)
         print("Sending frame %s..." % str(frame), end='')
-        cl.send_frame(client_socket, frame_loc, sleep=sleep)
+        cs.send_frame(client_socket, frame_loc, sleep=sleep)
         print("Done.")
         print("Waiting for frame " + str(frame) + " reception...", end='')
-        cl.waiting_for_ack(client_socket, frame)
+        cs.waiting_for_ack(client_socket, frame=frame)
         print("ACK")
 
     print("\nFrames sent!")
-    print("\n --------------------------")
-    print("| AWS FACEDETECT - GOODBYE |")
-    print(" --------------------------")
+
+    print("\n **** RECEIVING FRAMES ****")
+
+    for frame in [increment*x for x in range(int(frame_nbr/increment))]:
+
+        frame_size = int(cs.receive_bytes_to_string(client_socket))
+        cs.receive_frame(client_socket, frame, frame_size, save_loc)
+        print("Frame " + str(frame) + " received.")
+
+        print("Sending ack...", end='')
+        cs.send_frame_ack(client_socket, frame=frame)
+        print("Sent.")
+
+    print("\nFrames received!")
+
+    print("\n **** GENERATING VIDEO ****")
+
+    converter = Converter(frame_nbr, increment, fps=rate)
+
+    imglist = converter.initiate_framelist(save_loc)
+    print("\n Generating video from " + str(frame_nbr/increment) +
+          " frames at " + str(rate) + " fps.")
+
+    converter.write_video(imglist)
+
+    print("\nVideo encoded!")
+
+    print("\n ---------------------")
+    print("| EOP Sockets - GOODBYE |")
+    print(" -----------------------")
 
 
 if __name__ == '__main__':

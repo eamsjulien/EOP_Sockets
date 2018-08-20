@@ -54,7 +54,7 @@ if [[ "${MODE}" = "server" ]]; then
   if [[ `ls -1 inbox/*.jpg 2>/dev/null | wc -l` -gt 0 ]]; then
     rm inbox/*.jpg
   fi
-  python3 main.py
+  python3 main.py -s $SLEEP
 else
   CLIENT=1
 fi
@@ -64,5 +64,8 @@ if [[ "${CLIENT}" = 1 ]]; then
   if [[ ! -d "$CAPTURE_DIR" ]]; then
     mkdir "$CAPTURE_DIR"
   fi
-  python3 main_client.py -f $FRAMES -i $INCREMENT -a $ADDRESS -s $SLEEP
+  if [[ `ls -1 inbox/*.jpg 2>/dev/null | wc -l` -gt 0 ]]; then
+    rm inbox/*.jpg
+  fi
+  python3 main_client.py -f $FRAMES -i $INCREMENT -a $ADDRESS -s $SLEEP -r $RATE
 fi
