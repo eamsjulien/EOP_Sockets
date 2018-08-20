@@ -64,7 +64,9 @@ def main(): # pylint: disable=too-many-statements
 
         print("Segments detection...")
         os.system(eop_loc + 'easyOpenPose.bin inbox/frame'
-                  + str(curr_frame) + '.jpg 0 500 500')
+                  + str(curr_frame) + '.jpg 0 500 500 '
+                  + eop_loc + 'pose_deploy_linevec.prototxt '
+                  + eop_loc + 'pose_iter_440000.caffemodel')
         os.system('mv test_openpose.jpg inbox/frame'
                   + str(curr_frame) + '.jpg')
 
@@ -82,7 +84,7 @@ def main(): # pylint: disable=too-many-statements
         ch.send_frame(client, frame_loc, sleep=sleep)
         print("Done.")
         print("Waiting for frame " + str(curr_frame) + " reception...", end='')
-        ch.waiting_for_ack(client, curr_frame)
+        ch.waiting_for_ack(client, frame=curr_frame)
         print("ACK")
 
     print("\nFrames sent!")
