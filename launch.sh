@@ -34,6 +34,11 @@ do
       shift
       shift
       ;;
+    -r|--rate)
+      RATE="$2"
+      shift
+      shift
+      ;;
     *)
       POSITIONAL+=("$1")
       shift
