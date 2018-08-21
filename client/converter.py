@@ -11,18 +11,20 @@ class Converter:
     def initiate_framelist(self, location):
         img = []
         for i in [self.step * x for x in range(int(self.frames/self.step))]:
-            img.append(cv2.imread(location + '/frame' + str(i) + '.jpg'))
+            frame = cv2.imread(location + '/frame' + str(i) + '.jpg')
+            img.append(cv2.resize(frame, (500, 500)))
         return img
 
     def initiate_inputlist(self, location):
         img = []
         for i in [self.step * x for x in range(int(self.frames/self.step))]:
-            img.append(cv2.imread(location + '/frame' + str(i) + '.jpg'))
+            frame = cv2.imread(location + '/frame' + str(i) + '.jpg')
+            img.append(cv2.resize(frame, (500, 500)))
         return img
 
     def substract_images(self, proc_frames, input_frames):
         subtract = []
-        for item in proc_frames:
+        for item in range(len(proc_frames)):
             img = cv2.subtract(proc_frames[item], input_frames[item])
             subtract.append(img)
         return subtract

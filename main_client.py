@@ -106,7 +106,7 @@ def main(): #pylint: disable=too-many-locals, too-many-statements
     print("\n Generating video from " + str(frame_nbr/increment) +
           " frames at " + str(rate) + " fps.")
 
-    inputlist = converter.initiate_inputlist(frame_loc)
+    inputlist = converter.initiate_inputlist(capture_loc)
 
     outputlist = converter.substract_images(imglist, inputlist)
 
