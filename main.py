@@ -24,7 +24,7 @@ def main(): # pylint: disable=too-many-statements
     # EOP_Sockets SERVER #
 
     print(" ----------------------")
-    print("| EOP Sockets - SERVER |")
+    print("| EOP SOCKETS - SERVER |")
     print(" ----------------------")
 
     print("\n Initializing ENV variables...", end='')
@@ -95,7 +95,7 @@ def main(): # pylint: disable=too-many-statements
     print("Done!")
 
     print("\n ---------------------")
-    print("| EOP Sockets - GOODBYE |")
+    print("| EOP SOCKETS - GOODBYE |")
     print(" -----------------------")
 
 if __name__ == '__main__':

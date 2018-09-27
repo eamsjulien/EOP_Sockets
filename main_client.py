@@ -36,11 +36,11 @@ def main(): #pylint: disable=too-many-locals, too-many-statements
     increment = args['increment']
     rate = args['rate']
 
-    # FACEDETECT CLIENT #
+    # EOP SOCKET CLIENT #
 
-    print(" -------------------------")
-    print("| AWS FACEDETECT - CLIENT |")
-    print(" -------------------------")
+    print(" ----------------------")
+    print("| EOP SOCKETS - CLIENT |")
+    print(" ----------------------")
 
     print("\n Initializing ENV variables...", end='')
     capture_loc, save_loc = cs.init_eopsock_environ_folder()
@@ -115,7 +115,7 @@ def main(): #pylint: disable=too-many-locals, too-many-statements
     print("\nVideo encoded!")
 
     print("\n ---------------------")
-    print("| EOP Sockets - GOODBYE |")
+    print("| EOP SOCKETS - GOODBYE |")
     print(" -----------------------")
 
 
