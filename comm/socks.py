@@ -67,6 +67,7 @@ def init_server_socket(address=None, port=5000):
               )
         ip_raw = subprocess.check_output([cmd], shell=True)
         address = ip_raw.decode('utf-8')[:-1]
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server_socket.bind((address, port))
     return server_socket
 
