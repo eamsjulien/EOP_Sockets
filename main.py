@@ -4,12 +4,12 @@ Main handler for the EOP_Sockets server component.
 Usage: python3 main.py [--sleep SLEEP]
 """
 
-import os
 import argparse
 
 import comm.socks as ch
+import server.detector as dt
 
-def main(): # pylint: disable=too-many-statements
+def main(): # pylint: disable=too-many-statements, too-many-locals
     """Main function for server loop."""
 
     # PYTHON PARSER VIA ARGPARSE #
@@ -56,23 +56,22 @@ def main(): # pylint: disable=too-many-statements
 
     print("\n **** RECEIVING FRAMES ****")
 
+    frame_list = []
     for curr_frame in [frame_step*x for x in range(int(frame_nbr/frame_step))]:
 
         frame_size = int(ch.receive_bytes_to_string(client))
         ch.receive_frame(client, curr_frame, frame_size, save_loc)
         print("Frame " + str(curr_frame) + " received.")
 
-        print("Segments detection...")
-        os.system(eop_loc + 'easyOpenPose.bin inbox/frame'
-                  + str(curr_frame) + '.jpg 0 500 500 '
-                  + eop_loc + 'pose_deploy_linevec.prototxt '
-                  + eop_loc + 'pose_iter_440000.caffemodel')
-        os.system('mv test_openpose.jpg inbox/frame'
-                  + str(curr_frame) + '.jpg')
-
         print("Sending ack...", end='')
         ch.send_frame_ack(client, frame=curr_frame)
+        frame_list.append(curr_frame)
         print("Sent.")
+
+    print("Segments detection...")
+    for index_frame in range(0, len(frame_list), 3):
+        current_framelist = frame_list[index_frame:index_frame+3]
+        dt.parallel_seg(eop_loc, current_framelist, fname=dt.segmentation)
 
     print("\nFrames processing completed!")
 
